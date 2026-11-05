@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Qahwet El-Hay – Digital Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f7f4;--surface:#fff;--ink:#12372f;--muted:#5d7a72;--line:#d5e2dc;--accent:#e9a100;--on-accent:#2a1d00;--pine:#12372f;--on-pine:#f3f7f4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1f1b;--surface:#162b26;--ink:#e8f1ed;--muted:#92b0a6;--line:#27433b;--accent:#f0b429;--on-accent:#2a1d00;--pine:#1d3d35;--on-pine:#e8f1ed}}
+:root[data-theme="dark"]{--bg:#0e1f1b;--surface:#162b26;--ink:#e8f1ed;--muted:#92b0a6;--line:#27433b;--accent:#f0b429;--on-accent:#2a1d00;--pine:#1d3d35;--on-pine:#e8f1ed}
+html{scroll-padding-top:120px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,system-ui,sans-serif;line-height:1.6;padding-bottom:110px}
+header{background:var(--pine);color:var(--on-pine);padding:20px 18px 14px}
+.top{display:flex;justify-content:space-between;align-items:center;max-width:720px;margin:0 auto}
+h1{font-family:"Reem Kufi",Cairo,sans-serif;font-size:2rem;margin:0;line-height:1.2}
+.sub{max-width:720px;margin:2px auto 0;opacity:.8;font-size:.95rem}
+button{font:inherit;cursor:pointer}
+.lang{background:transparent;border:1.5px solid currentColor;color:inherit;border-radius:999px;padding:4px 14px;font-weight:600}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 18px;max-width:720px;margin:0 auto}
+.chip{flex:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 16px;font-weight:600}
+.chip[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+main{max-width:720px;margin:0 auto;padding:0 18px}
+h2{font-family:"Reem Kufi",Cairo,sans-serif;font-size:1.5rem;margin:28px 0 4px}
+.item{display:flex;gap:12px;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.item h3{margin:0;font-size:1.05rem}
+.item p{margin:0;color:var(--muted);font-size:.9rem}
+.price{font-weight:700;margin-top:2px}
+.add{flex:none;min-width:84px;display:flex;justify-content:center;align-items:center}
+.add>button{background:var(--surface);color:var(--ink);border:1.5px solid var(--ink);border-radius:10px;padding:6px 16px;font-weight:700}
+.step{display:flex;align-items:center;gap:10px;background:var(--accent);color:var(--on-accent);border-radius:10px;padding:2px 4px}
+.step button{background:none;border:0;color:inherit;font-size:1.3rem;font-weight:700;width:32px;height:32px}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line);z-index:6}
+.bar button,.send{display:flex;justify-content:space-between;width:100%;max-width:720px;margin:0 auto;background:var(--pine);color:var(--on-pine);border:0;border-radius:14px;padding:14px 18px;font-weight:700;font-size:1.05rem}
+.bar button:disabled{opacity:.45;cursor:default}
+.sheet{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.5);display:none;align-items:flex-end}
+.sheet.open{display:flex}
+.panel{background:var(--bg);width:100%;max-width:720px;margin:0 auto;border-radius:20px 20px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:88%;overflow:auto}
+.row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.total{font-weight:700;font-size:1.15rem;padding:12px 0}
+label{display:block;font-weight:600;margin-top:10px}
+input,textarea{width:100%;font:inherit;padding:10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.send{background:#1f9d55;color:#fff;margin-top:14px;text-decoration:none;justify-content:center}
+.close{background:none;border:0;color:var(--muted);font-weight:600;float:inline-end}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<header><div class="top"><h1 id="name"></h1><button class="lang" id="lang"></button></div><div class="sub" id="tag"></div></header>
+<nav><div class="chips" id="chips"></div></nav>
+<main id="menu"></main>
+<div class="bar"><button id="open" disabled><span id="cnt"></span><span id="sum"></span></button></div>
+<div class="sheet" id="sheet"><div class="panel">
+<button class="close" id="close"></button>
+<h2 id="ctitle" style="margin-top:0"></h2>
+<div id="lines"></div><div class="total row" id="tot"></div>
+<label id="lname" for="cname"></label><input id="cname" autocomplete="name">
+<label id="lnote" for="cnote"></label><textarea id="cnote" rows="2"></textarea>
+<a class="send" id="send" target="_blank" rel="noopener"></a>
+</div></div>
+<script>
+/* ===== EDIT THIS BLOCK FOR EACH CLIENT ===== */
+const CONFIG={
+  phone:"201000000000",            // WhatsApp number, country code, no + or spaces
+  currency:{ar:"ج.م",en:"EGP"},
+  name:{ar:"قهوة الحي",en:"Qahwet El-Hay"},
+  tagline:{ar:"قهوة وحلويات ومشروبات طازجة",en:"Coffee, sweets and fresh drinks"},
+  cats:[
+   {id:"hot",ar:"مشروبات ساخنة",en:"Hot drinks"},
+   {id:"cold",ar:"مشروبات باردة",en:"Cold drinks"},
+   {id:"food",ar:"أكل خفيف",en:"Light bites"},
+   {id:"sweet",ar:"حلويات",en:"Desserts"}],
+  items:[
+   {c:"hot",ar:"قهوة تركي",en:"Turkish coffee",da:"سادة أو مظبوط أو زيادة",de:"Plain, medium or sweet",p:35},
+   {c:"hot",ar:"كابتشينو",en:"Cappuccino",da:"إسبريسو مع رغوة الحليب",de:"Espresso with steamed milk foam",p:55},
+   {c:"hot",ar:"شاي كرك",en:"Karak tea",da:"شاي بالحليب والهيل",de:"Spiced milk tea with cardamom",p:40},
+   {c:"cold",ar:"كركديه",en:"Hibiscus",da:"بارد مع النعناع",de:"Chilled with mint",p:35},
+   {c:"cold",ar:"عصير برتقال",en:"Orange juice",da:"طازج بدون سكر",de:"Fresh, no added sugar",p:50},
+   {c:"cold",ar:"آيس لاتيه",en:"Iced latte",da:"إسبريسو وحليب بارد",de:"Espresso over cold milk",p:65},
+   {c:"food",ar:"فطير مشلتت بالعسل",en:"Feteer with honey",da:"عسل نحل وقشطة",de:"Honey and cream",p:90},
+   {c:"food",ar:"ساندوتش حلومي",en:"Halloumi sandwich",da:"جبنة حلوم مشوية وطماطم",de:"Grilled halloumi and tomato",p:75},
+   {c:"food",ar:"ساندوتش فلافل",en:"Falafel sandwich",da:"فلافل طازجة وسلطة",de:"Fresh falafel and salad",p:40},
+   {c:"sweet",ar:"أم علي",en:"Om Ali",da:"فرن ساخن بالمكسرات",de:"Hot from the oven with nuts",p:70},
+   {c:"sweet",ar:"بسبوسة بالقشطة",en:"Basbousa with cream",da:"قطعة كبيرة",de:"Large piece",p:45},
+   {c:"sweet",ar:"كنافة بالمانجو",en:"Mango kunafa",da:"مقرمشة مع صوص مانجو",de:"Crispy with mango sauce",p:85}]
+};
+/* ========================================= */
+const T={
+ ar:{add:"أضف",cart:"السلة",items:n=>n+" صنف",view:"عرض الطلب",empty:"أضف أصناف لتبدأ الطلب",total:"الإجمالي",name:"اسمك أو رقم الطاولة",note:"ملاحظات",send:"إرسال الطلب عبر واتساب",close:"إغلاق",sw:"English",hello:"طلب جديد",cust:"الاسم/الطاولة",notes:"ملاحظات"},
+ en:{add:"Add",cart:"Cart",items:n=>n+(n==1?" item":" items"),view:"View order",empty:"Add items to start your order",total:"Total",name:"Your name or table number",note:"Notes",send:"Send order on WhatsApp",close:"Close",sw:"العربية",hello:"New order",cust:"Name/Table",notes:"Notes"}};
+let L="ar",cart={};
+const $=id=>document.getElementById(id);
+const money=n=>n+" "+CONFIG.currency[L];
+function render(){
+ const t=T[L],h=document.documentElement;h.lang=L;h.dir=L=="ar"?"rtl":"ltr";
+ document.title=CONFIG.name[L];
+ $("name").textContent=CONFIG.name[L];$("tag").textContent=CONFIG.tagline[L];$("lang").textContent=t.sw;
+ $("chips").innerHTML=CONFIG.cats.map((c,i)=>`<button class="chip" data-c="${c.id}" ${i?"":'aria-current="true"'}>${c[L]}</button>`).join("");
+ $("menu").innerHTML=CONFIG.cats.map(c=>`<section id="s-${c.id}"><h2>${c[L]}</h2>`+CONFIG.items.map((it,i)=>it.c!=c.id?"":
+  `<div class="item"><div><h3>${it[L]}</h3><p>${L=="ar"?it.da:it.de}</p><div class="price">${money(it.p)}</div></div><div class="add" id="a${i}"></div></div>`).join("")+`</section>`).join("");
+ CONFIG.items.forEach((_,i)=>ctl(i));
+ $("close").textContent=t.close;$("ctitle").textContent=t.cart;$("lname").textContent=t.name;$("lnote").textContent=t.note;$("send").textContent=t.send;
+ totals();
+}
+function ctl(i){
+ const q=cart[i]||0,t=T[L],el=$("a"+i);if(!el)return;
+ el.innerHTML=q?`<div class="step"><button data-i="${i}" data-d="1" aria-label="+">+</button><b>${q}</b><button data-i="${i}" data-d="-1" aria-label="−">−</button></div>`:`<button data-i="${i}" data-d="1">${t.add}</button>`;
+}
+function totals(){
+ const t=T[L],ids=Object.keys(cart).filter(i=>cart[i]);
+ const n=ids.reduce((s,i)=>s+cart[i],0),sum=ids.reduce((s,i)=>s+cart[i]*CONFIG.items[i].p,0);
+ $("open").disabled=!n;$("cnt").textContent=n?t.items(n):t.empty;$("sum").textContent=n?t.view+" · "+money(sum):"";
+ $("lines").innerHTML=ids.map(i=>`<div class="row"><span>${cart[i]} × ${CONFIG.items[i][L]}</span><span>${money(cart[i]*CONFIG.items[i].p)}</span></div>`).join("");
+ $("tot").innerHTML=`<span>${t.total}</span><span>${money(sum)}</span>`;
+ const lines=ids.map(i=>`• ${cart[i]} × ${CONFIG.items[i][L]} — ${money(cart[i]*CONFIG.items[i].p)}`);
+ const msg=[`*${t.hello} – ${CONFIG.name[L]}*`,...lines,`*${t.total}:* ${money(sum)}`,`${t.cust}: ${$("cname").value||"-"}`,$("cnote").value?`${t.notes}: ${$("cnote").value}`:""].filter(Boolean).join("\n");
+ $("send").href=`https://wa.me/${CONFIG.phone}?text=${encodeURIComponent(msg)}`;
+}
+document.addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.i!==undefined){const i=b.dataset.i;cart[i]=Math.max(0,(cart[i]||0)+ +b.dataset.d);ctl(i);totals()}
+ else if(b.dataset.c){document.querySelectorAll(".chip").forEach(c=>c.removeAttribute("aria-current"));b.setAttribute("aria-current","true");$("s-"+b.dataset.c).scrollIntoView({behavior:"smooth"})}
+ else if(b.id=="lang"){L=L=="ar"?"en":"ar";render()}
+ else if(b.id=="open")$("sheet").classList.add("open");
+ else if(b.id=="close")$("sheet").classList.remove("open");
+});
+$("sheet").addEventListener("click",e=>{if(e.target.id=="sheet")$("sheet").classList.remove("open")});
+["cname","cnote"].forEach(id=>$(id).addEventListener("input",totals));
+render();
+</script>
+</body>
+</html>
